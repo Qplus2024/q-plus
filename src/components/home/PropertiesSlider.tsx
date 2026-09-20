@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Bed, Bath, Maximize } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useT } from "@/i18n/LanguageContext";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 interface PropertyWithImage {
   id: string;
@@ -19,6 +21,7 @@ interface PropertyWithImage {
 
 const PropertiesSlider = () => {
   const [properties, setProperties] = useState<PropertyWithImage[]>([]);
+  const t = useT();
 
   useEffect(() => {
     const load = async () => {
@@ -42,6 +45,9 @@ const PropertiesSlider = () => {
     load();
   }, []);
 
+  const titles = useMemo(() => properties.map((p) => p.title), [properties]);
+  const translatedTitles = useAutoTranslate(titles);
+
   const formatPrice = (price: number | null) => {
     if (!price) return null;
     return new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(price);
@@ -54,8 +60,8 @@ const PropertiesSlider = () => {
     <section className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
-          <span className="text-sm font-semibold tracking-widest uppercase text-primary mb-2 block">Portafolio</span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">Propiedades Destacadas</h2>
+          <span className="text-sm font-semibold tracking-widest uppercase text-primary mb-2 block">{t.propertiesSlider.eyebrow}</span>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{t.propertiesSlider.title}</h2>
         </motion.div>
 
         <div className="flex flex-col md:flex-row gap-6 items-stretch">
@@ -75,31 +81,36 @@ const PropertiesSlider = () => {
                   width: "max-content",
                 }}
               >
-                {items.map((p, idx) => (
-                  <Link
-                    key={`${p.id}-${idx}`}
-                    to={`/propiedad/${p.slug}`}
-                    className="flex-shrink-0 w-72 rounded-xl overflow-hidden border border-border bg-background group shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="aspect-[4/3] overflow-hidden bg-muted">
-                      {p.image_url ? (
-                        <img src={p.image_url} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">Sin imagen</div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-display text-sm font-semibold text-foreground mb-1 truncate">{p.title}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{[p.neighborhood, p.city].filter(Boolean).join(", ")}</p>
-                      {p.price_sale && <p className="text-sm font-bold text-primary mb-2">{formatPrice(p.price_sale)}</p>}
-                      <div className="flex gap-3 text-xs text-muted-foreground">
-                        {p.bedrooms != null && <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" /> {p.bedrooms}</span>}
-                        {p.bathrooms != null && <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5" /> {p.bathrooms}</span>}
-                        {p.area_m2 != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5" /> {p.area_m2}m²</span>}
+                {items.map((p, idx) => {
+                  // `items` is the property list duplicated for the marquee loop,
+                  // so the original index is idx modulo the real length.
+                  const title = translatedTitles[idx % properties.length] || p.title;
+                  return (
+                    <Link
+                      key={`${p.id}-${idx}`}
+                      to={`/propiedad/${p.slug}`}
+                      className="flex-shrink-0 w-72 rounded-xl overflow-hidden border border-border bg-background group shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="aspect-[4/3] overflow-hidden bg-muted">
+                        {p.image_url ? (
+                          <img src={p.image_url} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">{t.propertiesSlider.noImage}</div>
+                        )}
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                      <div className="p-4">
+                        <h3 className="font-display text-sm font-semibold text-foreground mb-1 truncate">{title}</h3>
+                        <p className="text-xs text-muted-foreground mb-2">{[p.neighborhood, p.city].filter(Boolean).join(", ")}</p>
+                        {p.price_sale && <p className="text-sm font-bold text-primary mb-2">{formatPrice(p.price_sale)}</p>}
+                        <div className="flex gap-3 text-xs text-muted-foreground">
+                          {p.bedrooms != null && <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" /> {p.bedrooms}</span>}
+                          {p.bathrooms != null && <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5" /> {p.bathrooms}</span>}
+                          {p.area_m2 != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5" /> {p.area_m2}m²</span>}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -107,10 +118,10 @@ const PropertiesSlider = () => {
           {/* Fixed CTA */}
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="w-full md:w-64 shrink-0">
             <div className="h-full rounded-xl bg-primary p-8 flex flex-col justify-center items-start text-primary-foreground">
-              <h3 className="font-display text-xl font-bold mb-3">Encuentra tu propiedad ideal</h3>
-              <p className="text-sm opacity-80 mb-6 leading-relaxed">Explora nuestro catálogo completo de propiedades disponibles.</p>
+              <h3 className="font-display text-xl font-bold mb-3">{t.propertiesSlider.ctaTitle}</h3>
+              <p className="text-sm opacity-80 mb-6 leading-relaxed">{t.propertiesSlider.ctaText}</p>
               <Link to="/propiedades" className="inline-flex items-center gap-2 bg-background text-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:gap-3 transition-all">
-                Ver todas <ArrowRight className="h-4 w-4" />
+                {t.propertiesSlider.ctaButton} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </motion.div>

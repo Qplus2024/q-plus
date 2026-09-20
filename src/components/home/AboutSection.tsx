@@ -1,14 +1,17 @@
 import { motion } from "framer-motion";
 import { Target, TrendingUp, Users, Shield } from "lucide-react";
-
-const highlights = [
-  { icon: Target, label: "Evaluación estratégica" },
-  { icon: TrendingUp, label: "Seguimiento continuo" },
-  { icon: Users, label: "Administración de capital" },
-  { icon: Shield, label: "Inversiones seguras" },
-];
+import { useT } from "@/i18n/LanguageContext";
 
 const AboutSection = () => {
+  const t = useT();
+
+  const highlights = [
+    { icon: Target, label: t.about.highlight1 },
+    { icon: TrendingUp, label: t.about.highlight2 },
+    { icon: Users, label: t.about.highlight3 },
+    { icon: Shield, label: t.about.highlight4 },
+  ];
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -23,7 +26,7 @@ const AboutSection = () => {
           >
             <img
               src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80&fm=webp"
-              alt="Equipo profesional Q+ trabajando en estrategia de inversión"
+              alt={t.about.imageAlt}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent" />
@@ -37,25 +40,16 @@ const AboutSection = () => {
             transition={{ duration: 0.6, delay: 0.15 }}
           >
             <span className="text-sm font-semibold tracking-widest uppercase text-primary mb-2 block">
-              Quiénes somos
+              {t.about.eyebrow}
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Somos Q+
+              {t.about.title}
             </h2>
             <p className="font-body text-muted-foreground leading-relaxed mb-4">
-              Somos la mejor elección para generar rentabilidad con inversiones
-              seguras a corto, mediano y largo plazo, según tus necesidades.
-              Ofrecemos servicios de evaluación, seguimiento, venta y
-              administración de capital por medio de propiedades e inversiones
-              estratégicas.
+              {t.about.paragraph1}
             </p>
             <p className="font-body text-muted-foreground leading-relaxed mb-8">
-              Un equipo multidisciplinario con experiencia en marketing digital,
-              análisis financiero y relaciones estratégicas con empresarios e
-              inversionistas. Nuestra red de contactos y alianzas nos permite
-              identificar oportunidades antes que el mercado, garantizando
-              decisiones informadas y resultados medibles para cada uno de
-              nuestros clientes.
+              {t.about.paragraph2}
             </p>
 
             {/* Highlight pills */}

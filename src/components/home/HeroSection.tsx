@@ -3,29 +3,34 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
+import { useT } from "@/i18n/LanguageContext";
 
-const slides = [
-  {
-    title: "Tu próxima propiedad, una decisión inteligente",
-    subtitle: "Encuentra el hogar perfecto con el respaldo de expertos",
-    cta: "Ver propiedades",
-    link: "/propiedades",
-    image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&fm=webp",
-  },
-  {
-    title: "Invierte en el exterior con respaldo experto",
-    subtitle: "Accede a oportunidades internacionales de alto retorno",
-    cta: "Explorar inversiones",
-    link: "/inversiones",
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80&fm=webp",
-  },
+const SLIDE_IMAGES = [
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&fm=webp",
+  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80&fm=webp",
 ];
 
 const HeroSection = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const t = useT();
+
+  const slides = [
+    {
+      title: t.hero.slide1Title,
+      subtitle: t.hero.slide1Subtitle,
+      cta: t.hero.slide1Cta,
+      link: "/propiedades",
+      image: SLIDE_IMAGES[0],
+    },
+    {
+      title: t.hero.slide2Title,
+      subtitle: t.hero.slide2Subtitle,
+      cta: t.hero.slide2Cta,
+      link: "/inversiones",
+      image: SLIDE_IMAGES[1],
+    },
+  ];
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -102,7 +107,7 @@ const HeroSection = () => {
                 ? "bg-white w-8"
                 : "bg-white/50 hover:bg-white/70"
             }`}
-            aria-label={`Slide ${i + 1}`}
+            aria-label={`${t.hero.slideAria} ${i + 1}`}
           />
         ))}
       </div>

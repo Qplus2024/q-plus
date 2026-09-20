@@ -2,3 +2,6 @@ project_id = "qfidllfjjdhqybchhedc"
 
 [functions.generate-description]
 verify_jwt = false
+
+[functions.translate]
+verify_jwt = false

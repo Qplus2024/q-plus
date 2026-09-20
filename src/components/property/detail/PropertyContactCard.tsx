@@ -5,9 +5,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import type { Property, PriceDisplayMode } from "@/types/property";
+import { useT } from "@/i18n/LanguageContext";
 
 interface PropertyContactCardProps {
   property: Property;
+  /** Title already translated by the page */
+  displayTitle?: string;
 }
 
 const formatPrice = (price: number | null): string => {
@@ -39,15 +42,17 @@ const InstagramIcon = () => (
   </svg>
 );
 
-const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
+const PropertyContactCard = ({ property, displayTitle }: PropertyContactCardProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const t = useT();
 
   // Phone number - official Q+ Inmobiliaria contact
   const phoneNumber = "573168754469";
 
-  const shareMessage = `¡Mira esta propiedad! ${property.title}`;
+  const title = displayTitle || property.title;
+  const shareMessage = `${t.property.shareMessage} ${title}`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const fullMessage = `${shareMessage}\n${shareUrl}`;
 
@@ -62,15 +67,15 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
               <div className="text-2xl font-bold text-foreground">
                 {formatPrice(property.price_sale)}
               </div>
-              <div className="text-sm text-muted-foreground">Precio de venta</div>
+              <div className="text-sm text-muted-foreground">{t.property.salePrice}</div>
             </div>
           )}
           {property.price_rent && (
             <div className="pt-2 border-t border-border mt-2">
               <div className="text-xl font-semibold text-foreground">
-                {formatPrice(property.price_rent)}/mes
+                {formatPrice(property.price_rent)}{t.property.perMonth}
               </div>
-              <div className="text-sm text-muted-foreground">Precio de arriendo</div>
+              <div className="text-sm text-muted-foreground">{t.property.rentPrice}</div>
             </div>
           )}
         </div>
@@ -81,9 +86,9 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
       return (
         <div>
           <div className="text-2xl font-bold text-foreground">
-            {formatPrice(property.price_rent)}/mes
+            {formatPrice(property.price_rent)}{t.property.perMonth}
           </div>
-          <div className="text-sm text-muted-foreground">Precio de arriendo</div>
+          <div className="text-sm text-muted-foreground">{t.property.rentPrice}</div>
         </div>
       );
     }
@@ -94,19 +99,19 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
           <div className="text-2xl font-bold text-foreground">
             {formatPrice(property.price_sale)}
           </div>
-          <div className="text-sm text-muted-foreground">Precio de venta</div>
+          <div className="text-sm text-muted-foreground">{t.property.salePrice}</div>
         </div>
       );
     }
-    
+
     return (
-      <div className="text-lg text-muted-foreground">Precio a consultar</div>
+      <div className="text-lg text-muted-foreground">{t.property.priceOnRequest}</div>
     );
   };
 
   const handleWhatsApp = () => {
     const message = encodeURIComponent(
-      `Hola, estoy interesado en la propiedad: ${property.title}\n${window.location.href}`
+      `${t.property.whatsappMessage} ${title}\n${window.location.href}`
     );
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
@@ -128,8 +133,8 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
   const handleShareInstagram = async () => {
     await navigator.clipboard.writeText(fullMessage);
     toast({
-      title: "Link copiado",
-      description: "Pega el enlace en tu historia o mensaje de Instagram",
+      title: t.property.linkCopiedTitle,
+      description: t.property.instagramCopiedDesc,
     });
     window.open("instagram://", "_blank");
     setShareOpen(false);
@@ -144,8 +149,8 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
     await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     toast({
-      title: "Link copiado",
-      description: "El enlace se ha copiado al portapapeles",
+      title: t.property.linkCopiedTitle,
+      description: t.property.linkCopiedDesc,
     });
     setTimeout(() => setCopied(false), 2000);
     setShareOpen(false);
@@ -171,7 +176,7 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
       className: "text-pink-600 hover:bg-pink-50",
     },
     {
-      name: "Correo electrónico",
+      name: t.property.shareEmail,
       icon: <Mail className="w-5 h-5" />,
       onClick: handleShareEmail,
       className: "text-muted-foreground hover:bg-muted",
@@ -190,7 +195,7 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
             onClick={handleWhatsApp}
           >
             <MessageCircle className="w-5 h-5" />
-            WhatsApp
+            {t.property.whatsapp}
           </Button>
           <Button
             variant="outline"
@@ -199,7 +204,7 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
             onClick={handleCall}
           >
             <Phone className="w-5 h-5" />
-            Llamar
+            {t.property.call}
           </Button>
           
           <Popover open={shareOpen} onOpenChange={setShareOpen}>
@@ -209,12 +214,12 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
                 className="w-full gap-2"
               >
                 <Share2 className="w-5 h-5" />
-                Compartir
+                {t.property.share}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-64 p-2" align="center">
               <div className="text-sm font-medium text-muted-foreground px-2 py-1.5">
-                Compartir propiedad
+                {t.property.shareProperty}
               </div>
               <div className="space-y-1">
                 {shareOptions.map((option) => (
@@ -234,7 +239,7 @@ const PropertyContactCard = ({ property }: PropertyContactCardProps) => {
                   className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-muted-foreground hover:bg-muted transition-colors"
                 >
                   {copied ? <Check className="w-5 h-5 text-green-600" /> : <Link className="w-5 h-5" />}
-                  {copied ? "¡Copiado!" : "Copiar link"}
+                  {copied ? t.property.copied : t.property.copyLink}
                 </button>
               </div>
             </PopoverContent>

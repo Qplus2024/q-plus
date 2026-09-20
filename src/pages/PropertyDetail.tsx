@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Header from "@/components/layout/Header";
@@ -10,6 +11,8 @@ import PropertyContactCard from "@/components/property/detail/PropertyContactCar
 import PropertyFeatures from "@/components/property/detail/PropertyFeatures";
 import PropertyMap from "@/components/property/detail/PropertyMap";
 import { usePropertyDetail } from "@/hooks/usePropertyDetail";
+import { useT } from "@/i18n/LanguageContext";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 const LoadingSkeleton = () => (
   <div className="min-h-screen bg-background">
@@ -18,7 +21,7 @@ const LoadingSkeleton = () => (
       <div className="container mx-auto px-4 py-8">
         {/* Gallery skeleton */}
         <Skeleton className="w-full aspect-[16/10] md:aspect-[16/9] rounded-xl mb-8" />
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <Skeleton className="h-8 w-24" />
@@ -41,47 +44,63 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-const NotFound = () => (
-  <div className="min-h-screen bg-background flex flex-col">
-    <Header />
-    <main className="flex-1 flex items-center justify-center pt-16">
-      <div className="text-center px-4">
-        <h1 className="text-3xl font-display font-bold mb-4">
-          Propiedad no encontrada
-        </h1>
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          La propiedad que buscas no existe o ya no está disponible.
-        </p>
-        <Link to="/propiedades">
-          <Button size="lg" className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Ver todas las propiedades
-          </Button>
-        </Link>
-      </div>
-    </main>
-    <Footer />
-  </div>
-);
+const NotFound = () => {
+  const t = useT();
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      <main className="flex-1 flex items-center justify-center pt-16">
+        <div className="text-center px-4">
+          <h1 className="text-3xl font-display font-bold mb-4">
+            {t.property.notFoundTitle}
+          </h1>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            {t.property.notFoundText}
+          </p>
+          <Link to="/propiedades">
+            <Button size="lg" className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {t.property.seeAllProperties}
+            </Button>
+          </Link>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 const PropertyDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error } = usePropertyDetail(slug);
+  const t = useT();
+
+  const property = data?.property ?? null;
+
+  // Title and description translated together in a single request, then
+  // handed down so the child components do not each ask for their own.
+  const translatable = useMemo(
+    () => [property?.title ?? '', property?.main_description ?? ''],
+    [property?.title, property?.main_description]
+  );
+  const [translatedTitle, translatedDescription] = useAutoTranslate(translatable);
 
   if (isLoading) {
     return <LoadingSkeleton />;
   }
 
-  if (error || !data?.property) {
+  if (error || !property) {
     return <NotFound />;
   }
 
-  const { property, blocks, propertyValues } = data;
+  const { blocks, propertyValues } = data!;
+  const displayTitle = translatedTitle || property.title;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="pt-16 pb-8">
         <div className="container mx-auto px-4 py-6 md:py-8">
           {/* Back link */}
@@ -90,14 +109,14 @@ const PropertyDetail = () => {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Volver a propiedades</span>
+            <span className="text-sm">{t.property.back}</span>
           </Link>
 
           {/* Gallery */}
           <div className="mb-8">
             <PropertyGallery
               media={property.property_media || []}
-              title={property.title}
+              title={displayTitle}
             />
           </div>
 
@@ -105,13 +124,17 @@ const PropertyDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              <PropertyInfo property={property} />
-              
+              <PropertyInfo
+                property={property}
+                displayTitle={displayTitle}
+                displayDescription={translatedDescription || property.main_description}
+              />
+
               {/* Contact Card - Mobile Only */}
               <div className="lg:hidden">
-                <PropertyContactCard property={property} />
+                <PropertyContactCard property={property} displayTitle={displayTitle} />
               </div>
-              
+
               <PropertyFeatures
                 blocks={blocks}
                 propertyValues={propertyValues}
@@ -128,7 +151,7 @@ const PropertyDetail = () => {
 
             {/* Sidebar - Desktop only */}
             <div className="hidden lg:block">
-              <PropertyContactCard property={property} />
+              <PropertyContactCard property={property} displayTitle={displayTitle} />
             </div>
           </div>
         </div>

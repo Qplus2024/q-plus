@@ -1,6 +1,7 @@
 import { MapPin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useT } from "@/i18n/LanguageContext";
 
 interface PropertyMapProps {
   lat: number | null;
@@ -11,6 +12,7 @@ interface PropertyMapProps {
 }
 
 const PropertyMap = ({ lat, lng, address, city, neighborhood }: PropertyMapProps) => {
+  const t = useT();
   const fullAddress = [address, neighborhood, city].filter(Boolean).join(", ");
   
   const hasCoordinates = lat !== null && lng !== null;
@@ -35,7 +37,7 @@ const PropertyMap = ({ lat, lng, address, city, neighborhood }: PropertyMapProps
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <MapPin className="w-5 h-5 text-primary" />
-          Ubicación
+          {t.property.location}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -48,7 +50,7 @@ const PropertyMap = ({ lat, lng, address, city, neighborhood }: PropertyMapProps
         >
           <div className="relative aspect-video rounded-lg overflow-hidden">
             <iframe
-              title="Ubicación de la propiedad"
+              title={t.property.mapTitle}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -70,7 +72,7 @@ const PropertyMap = ({ lat, lng, address, city, neighborhood }: PropertyMapProps
               className="absolute top-2 right-2 bg-white rounded-lg px-3 py-1.5 shadow-md flex items-center gap-2 hover:bg-gray-50 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="text-sm font-medium">Ampliar</span>
+              <span className="text-sm font-medium">{t.property.expand}</span>
             </a>
           </div>
         </a>
@@ -88,7 +90,7 @@ const PropertyMap = ({ lat, lng, address, city, neighborhood }: PropertyMapProps
         >
           <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
             <MapPin className="w-4 h-4" />
-            Abrir en Google Maps
+            {t.property.openInMaps}
             <ExternalLink className="w-4 h-4 ml-auto" />
           </a>
         </Button>

@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PropertyCard from '@/components/property/PropertyCard';
-import { PrivateListingsSection } from '@/components/property/PrivateListingsSection';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useT } from '@/i18n/LanguageContext';
+import { useAutoTranslate } from '@/hooks/useAutoTranslate';
 
 const PAGE_SIZE = 8;
 
@@ -39,6 +40,7 @@ const Properties = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cityFilter, setCityFilter] = useState<string>('all');
   const [page, setPage] = useState(0);
+  const t = useT();
 
   useEffect(() => {
     loadProperties();
@@ -97,6 +99,10 @@ const Properties = () => {
   const displayItems = hasMore ? pageItems.slice(0, 7) : pageItems;
   const remaining = totalFiltered - pageStart - displayItems.length;
 
+  // One batched translation request for the titles currently on screen.
+  const visibleTitles = useMemo(() => displayItems.map((p) => p.title), [displayItems]);
+  const translatedTitles = useAutoTranslate(visibleTitles);
+
   const getMainImage = (property: Property) => {
     const mainMedia = property.property_media?.find((m) => m.is_main);
     return mainMedia?.url || property.property_media?.[0]?.url;
@@ -109,10 +115,10 @@ const Properties = () => {
       <section className="pt-24 pb-12 bg-secondary">
         <div className="container mx-auto px-4">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Propiedades
+            {t.properties.title}
           </h1>
           <p className="font-body text-muted-foreground">
-            Encuentra tu próximo hogar entre nuestra selección
+            {t.properties.subtitle}
           </p>
         </div>
       </section>
@@ -123,7 +129,7 @@ const Properties = () => {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar propiedades..."
+                placeholder={t.properties.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -131,10 +137,10 @@ const Properties = () => {
             </div>
             <Select value={cityFilter} onValueChange={setCityFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Todas las ciudades" />
+                <SelectValue placeholder={t.properties.allCities} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las ciudades</SelectItem>
+                <SelectItem value="all">{t.properties.allCities}</SelectItem>
                 {cities.map((city) => (
                   <SelectItem key={city} value={city}>{city}</SelectItem>
                 ))}
@@ -155,21 +161,22 @@ const Properties = () => {
           ) : filteredProperties.length === 0 ? (
             <div className="text-center py-16">
               <p className="font-body text-muted-foreground text-lg">
-                No se encontraron propiedades
+                {t.properties.noResults}
               </p>
               {(searchQuery || cityFilter !== 'all') && (
                 <button
                   onClick={() => { setSearchQuery(''); setCityFilter('all'); }}
                   className="mt-4 text-primary hover:underline font-body"
                 >
-                  Limpiar filtros
+                  {t.properties.clearFilters}
                 </button>
               )}
             </div>
           ) : (
             <>
               <p className="font-body text-muted-foreground mb-6">
-                {totalFiltered} propiedad{totalFiltered !== 1 ? 'es' : ''} encontrada{totalFiltered !== 1 ? 's' : ''}
+                {totalFiltered}{' '}
+                {totalFiltered === 1 ? t.properties.foundOne : t.properties.foundMany}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayItems.map((property, index) => (
@@ -182,7 +189,7 @@ const Properties = () => {
                     <PropertyCard
                       id={property.id}
                       slug={property.slug}
-                      title={property.title}
+                      title={translatedTitles[index] || property.title}
                       address={property.address || undefined}
                       city={property.city || undefined}
                       price_sale={property.price_sale || undefined}
@@ -210,10 +217,10 @@ const Properties = () => {
                       + {remaining}
                     </span>
                     <span className="font-body text-muted-foreground">
-                      propiedad{remaining !== 1 ? 'es' : ''} más
+                      {remaining === 1 ? t.properties.moreOne : t.properties.moreMany}
                     </span>
                     <span className="inline-flex items-center gap-2 font-body text-sm font-medium text-primary group-hover:gap-3 transition-all">
-                      Ver más <ArrowRight className="h-4 w-4" />
+                      {t.properties.seeMore} <ArrowRight className="h-4 w-4" />
                     </span>
                   </motion.button>
                 )}
@@ -225,7 +232,7 @@ const Properties = () => {
                     onClick={() => setPage(0)}
                     className="font-body text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
-                    Volver al inicio
+                    {t.properties.backToStart}
                   </button>
                 </div>
               )}
@@ -233,8 +240,6 @@ const Properties = () => {
           )}
         </div>
       </section>
-
-      <PrivateListingsSection />
 
       <Footer />
     </div>

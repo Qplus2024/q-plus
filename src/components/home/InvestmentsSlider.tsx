@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Globe, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useT } from "@/i18n/LanguageContext";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 
 interface Investment {
   id: string;
@@ -17,14 +19,15 @@ interface Investment {
   image_url: string | null;
 }
 
-const typeLabels: Record<string, string> = {
-  residencial: "Residencial",
-  comercial: "Comercial",
-  fondo: "Fondo",
-};
-
 const InvestmentsSlider = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const t = useT();
+
+  const typeLabels: Record<string, string> = {
+    residencial: t.investmentsSlider.typeResidential,
+    comercial: t.investmentsSlider.typeCommercial,
+    fondo: t.investmentsSlider.typeFund,
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -40,6 +43,9 @@ const InvestmentsSlider = () => {
   const formatAmount = (amount: number, currency: string | null) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: currency || "USD", maximumFractionDigits: 0 }).format(amount);
 
+  const titles = useMemo(() => investments.map((i) => i.title), [investments]);
+  const translatedTitles = useAutoTranslate(titles);
+
   const duration = investments.length * 8;
   const items = investments.length > 0 ? [...investments, ...investments] : [];
 
@@ -47,18 +53,18 @@ const InvestmentsSlider = () => {
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
-          <span className="text-sm font-semibold tracking-widest uppercase text-primary mb-2 block">Oportunidades</span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">Inversiones Internacionales</h2>
+          <span className="text-sm font-semibold tracking-widest uppercase text-primary mb-2 block">{t.investmentsSlider.eyebrow}</span>
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">{t.investmentsSlider.title}</h2>
         </motion.div>
 
         <div className="flex flex-col md:flex-row gap-6 items-stretch">
           {/* Fixed CTA — LEFT */}
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="w-full md:w-64 shrink-0 order-2 md:order-1">
             <div className="h-full rounded-xl bg-primary p-8 flex flex-col justify-center items-start text-primary-foreground">
-              <h3 className="font-display text-xl font-bold mb-3">Invierte con respaldo experto</h3>
-              <p className="text-sm opacity-80 mb-6 leading-relaxed">Descubre oportunidades de inversión internacional con retornos atractivos y asesoría personalizada.</p>
+              <h3 className="font-display text-xl font-bold mb-3">{t.investmentsSlider.ctaTitle}</h3>
+              <p className="text-sm opacity-80 mb-6 leading-relaxed">{t.investmentsSlider.ctaText}</p>
               <Link to="/inversiones" className="inline-flex items-center gap-2 bg-background text-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:gap-3 transition-all">
-                Explorar <ArrowRight className="h-4 w-4" />
+                {t.investmentsSlider.ctaButton} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -79,32 +85,36 @@ const InvestmentsSlider = () => {
                   width: "max-content",
                 }}
               >
-                {items.map((inv, idx) => (
-                  <Link
-                    key={`${inv.id}-${idx}`}
-                    to="/inversiones"
-                    className="flex-shrink-0 w-72 rounded-xl overflow-hidden border border-border bg-background group shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="aspect-[4/3] overflow-hidden bg-muted">
-                      {inv.image_url ? (
-                        <img src={inv.image_url} alt={inv.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">Sin imagen</div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">{typeLabels[inv.type] || inv.type}</span>
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground"><Globe className="h-3 w-3" />{inv.country}</span>
+                {items.map((inv, idx) => {
+                  // `items` is the list duplicated for the marquee loop.
+                  const title = translatedTitles[idx % investments.length] || inv.title;
+                  return (
+                    <Link
+                      key={`${inv.id}-${idx}`}
+                      to="/inversiones"
+                      className="flex-shrink-0 w-72 rounded-xl overflow-hidden border border-border bg-background group shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="aspect-[4/3] overflow-hidden bg-muted">
+                        {inv.image_url ? (
+                          <img src={inv.image_url} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">{t.investmentsSlider.noImage}</div>
+                        )}
                       </div>
-                      <h3 className="font-display text-sm font-semibold text-foreground mb-1 truncate">{inv.title}</h3>
-                      <p className="text-sm font-bold text-primary mb-1">Desde {formatAmount(inv.min_amount, inv.currency)}</p>
-                      {inv.expected_return != null && (
-                        <p className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400"><TrendingUp className="h-3 w-3" />Retorno esperado: {inv.expected_return}%</p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">{typeLabels[inv.type] || inv.type}</span>
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground"><Globe className="h-3 w-3" />{inv.country}</span>
+                        </div>
+                        <h3 className="font-display text-sm font-semibold text-foreground mb-1 truncate">{title}</h3>
+                        <p className="text-sm font-bold text-primary mb-1">{t.investmentsSlider.from} {formatAmount(inv.min_amount, inv.currency)}</p>
+                        {inv.expected_return != null && (
+                          <p className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400"><TrendingUp className="h-3 w-3" />{t.investmentsSlider.expectedReturn}: {inv.expected_return}%</p>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>

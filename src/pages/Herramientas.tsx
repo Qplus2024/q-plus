@@ -17,8 +17,11 @@ import {
 } from '@/components/ui/table';
 import { evaluarCredito } from '@/lib/bank-data';
 import { evaluarRentabilidad, fmtCOP } from '@/lib/rental-calc';
+import { useT } from '@/i18n/LanguageContext';
 
 const Herramientas = () => {
+  const t = useT();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -26,12 +29,10 @@ const Herramientas = () => {
       <section className="pt-24 pb-12 bg-secondary">
         <div className="container mx-auto px-4">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Herramientas para inversionistas
+            {t.tools.title}
           </h1>
           <p className="font-body text-muted-foreground max-w-2xl">
-            Simula tu crédito hipotecario y calcula la rentabilidad de un
-            proyecto de renta corta, con cifras de referencia del mercado
-            colombiano.
+            {t.tools.subtitle}
           </p>
         </div>
       </section>
@@ -45,6 +46,7 @@ const Herramientas = () => {
 };
 
 function CreditSimulatorSection() {
+  const t = useT();
   const [valorInmueble, setValorInmueble] = useState(450_000_000);
   const [cuotaInicialPct, setCuotaInicialPct] = useState(30);
   const [ingresosMensuales, setIngresosMensuales] = useState(11_000_000);
@@ -74,11 +76,10 @@ function CreditSimulatorSection() {
           </div>
           <div>
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Simulador de crédito hipotecario
+              {t.tools.creditTitle}
             </h2>
             <p className="font-body text-sm text-muted-foreground">
-              Compara, banco por banco, la cuota estimada y si tu perfil
-              cumple los requisitos típicos.
+              {t.tools.creditSubtitle}
             </p>
           </div>
         </div>
@@ -86,11 +87,11 @@ function CreditSimulatorSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start">
           <Card className="lg:sticky lg:top-24">
             <CardHeader>
-              <CardTitle className="text-base">Datos del comprador</CardTitle>
+              <CardTitle className="text-base">{t.tools.buyerData}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="c-valor">Valor del inmueble (COP)</Label>
+                <Label htmlFor="c-valor">{t.tools.propertyValue}</Label>
                 <Input
                   id="c-valor"
                   type="number"
@@ -101,7 +102,7 @@ function CreditSimulatorSection() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label>Cuota inicial disponible</Label>
+                  <Label>{t.tools.downPayment}</Label>
                   <span className="font-mono text-sm font-semibold text-primary">
                     {cuotaInicialPct}%
                   </span>
@@ -116,7 +117,7 @@ function CreditSimulatorSection() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="c-ingresos">Ingresos mensuales netos del hogar (COP)</Label>
+                <Label htmlFor="c-ingresos">{t.tools.householdIncome}</Label>
                 <Input
                   id="c-ingresos"
                   type="number"
@@ -126,7 +127,7 @@ function CreditSimulatorSection() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="c-deudas">Deudas mensuales actuales (COP)</Label>
+                <Label htmlFor="c-deudas">{t.tools.currentDebts}</Label>
                 <Input
                   id="c-deudas"
                   type="number"
@@ -137,7 +138,7 @@ function CreditSimulatorSection() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="c-edad">Edad</Label>
+                  <Label htmlFor="c-edad">{t.tools.age}</Label>
                   <Input
                     id="c-edad"
                     type="number"
@@ -146,7 +147,7 @@ function CreditSimulatorSection() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="c-plazo">Plazo (años)</Label>
+                  <Label htmlFor="c-plazo">{t.tools.termYears}</Label>
                   <Input
                     id="c-plazo"
                     type="number"
@@ -163,7 +164,7 @@ function CreditSimulatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    Monto a financiar
+                    {t.tools.amountToFinance}
                   </p>
                   <p className="font-mono text-xl font-bold text-foreground">
                     {fmtCOP(montoAFinanciar)}
@@ -173,7 +174,7 @@ function CreditSimulatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    Cuota inicial en pesos
+                    {t.tools.downPaymentCop}
                   </p>
                   <p className="font-mono text-xl font-bold text-foreground">
                     {fmtCOP(cuotaInicialCop)}
@@ -186,11 +187,11 @@ function CreditSimulatorSection() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Banco</TableHead>
-                    <TableHead className="text-right">Tasa ref. EA</TableHead>
-                    <TableHead className="text-right">Cuota mensual est.</TableHead>
-                    <TableHead className="text-right">Endeudamiento</TableHead>
-                    <TableHead>Estado</TableHead>
+                    <TableHead>{t.tools.bank}</TableHead>
+                    <TableHead className="text-right">{t.tools.refRate}</TableHead>
+                    <TableHead className="text-right">{t.tools.monthlyPayment}</TableHead>
+                    <TableHead className="text-right">{t.tools.debtRatio}</TableHead>
+                    <TableHead>{t.tools.statusColumn}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -211,7 +212,7 @@ function CreditSimulatorSection() {
                           variant={r.cumple ? 'default' : 'outline'}
                           className={r.cumple ? 'bg-emerald-600 hover:bg-emerald-600' : 'text-amber-700 border-amber-300'}
                         >
-                          {r.cumple ? 'Cumple' : 'Revisar'}
+                          {r.cumple ? t.tools.meets : t.tools.review}
                         </Badge>
                       </TableCell>
                     </TableRow>
@@ -221,10 +222,7 @@ function CreditSimulatorSection() {
             </Card>
 
             <p className="text-xs text-muted-foreground leading-relaxed bg-muted rounded-lg p-4">
-              Cifras de referencia con fines educativos, calculadas con tasas
-              y topes aproximados de mercado a 2026. Cada banco define sus
-              propias tasas, cupos y política de riesgo. Confirma siempre las
-              condiciones vigentes directamente con la entidad.
+              {t.tools.creditDisclaimer}
             </p>
           </div>
         </div>
@@ -234,6 +232,7 @@ function CreditSimulatorSection() {
 }
 
 function RentalCalculatorSection() {
+  const t = useT();
   const [precioCompra, setPrecioCompra] = useState(600_000_000);
   const [adecuacion, setAdecuacion] = useState(40_000_000);
   const [porcentajeFinanciado, setPorcentajeFinanciado] = useState(70);
@@ -282,11 +281,10 @@ function RentalCalculatorSection() {
           </div>
           <div>
             <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Rentabilidad en renta corta
+              {t.tools.rentalTitle}
             </h2>
             <p className="font-body text-sm text-muted-foreground">
-              Para proyectos nuevos tipo Airbnb: NOI, Cap Rate, Cash-on-Cash y
-              ROI total del primer año.
+              {t.tools.rentalSubtitle}
             </p>
           </div>
         </div>
@@ -294,11 +292,11 @@ function RentalCalculatorSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 items-start">
           <Card className="lg:sticky lg:top-24">
             <CardHeader>
-              <CardTitle className="text-base">Compra y financiación</CardTitle>
+              <CardTitle className="text-base">{t.tools.purchaseFinancing}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="r-precio">Precio de compra (COP)</Label>
+                <Label htmlFor="r-precio">{t.tools.purchasePrice}</Label>
                 <Input
                   id="r-precio"
                   type="number"
@@ -307,7 +305,7 @@ function RentalCalculatorSection() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="r-adecuacion">Adecuación y amoblado (COP)</Label>
+                <Label htmlFor="r-adecuacion">{t.tools.furnishing}</Label>
                 <Input
                   id="r-adecuacion"
                   type="number"
@@ -317,7 +315,7 @@ function RentalCalculatorSection() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label>Porcentaje financiado</Label>
+                  <Label>{t.tools.financedPct}</Label>
                   <span className="font-mono text-sm font-semibold text-primary">
                     {porcentajeFinanciado}%
                   </span>
@@ -332,7 +330,7 @@ function RentalCalculatorSection() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="r-tasa">Tasa EA</Label>
+                  <Label htmlFor="r-tasa">{t.tools.rate}</Label>
                   <Input
                     id="r-tasa"
                     type="number"
@@ -342,7 +340,7 @@ function RentalCalculatorSection() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="r-plazo">Plazo (años)</Label>
+                  <Label htmlFor="r-plazo">{t.tools.termYears}</Label>
                   <Input
                     id="r-plazo"
                     type="number"
@@ -355,7 +353,7 @@ function RentalCalculatorSection() {
               <div className="pt-2 border-t border-border" />
 
               <div className="space-y-2">
-                <Label htmlFor="r-tarifa">Tarifa promedio por noche (COP)</Label>
+                <Label htmlFor="r-tarifa">{t.tools.nightlyRate}</Label>
                 <Input
                   id="r-tarifa"
                   type="number"
@@ -365,7 +363,7 @@ function RentalCalculatorSection() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label>Ocupación mensual estimada</Label>
+                  <Label>{t.tools.occupancy}</Label>
                   <span className="font-mono text-sm font-semibold text-primary">
                     {ocupacionPct}%
                   </span>
@@ -379,7 +377,7 @@ function RentalCalculatorSection() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="r-gastos">Gastos operativos fijos / mes</Label>
+                <Label htmlFor="r-gastos">{t.tools.fixedCosts}</Label>
                 <Input
                   id="r-gastos"
                   type="number"
@@ -389,7 +387,7 @@ function RentalCalculatorSection() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="r-comision">Comisión plataforma %</Label>
+                  <Label htmlFor="r-comision">{t.tools.platformFee}</Label>
                   <Input
                     id="r-comision"
                     type="number"
@@ -399,7 +397,7 @@ function RentalCalculatorSection() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="r-seguro">Seguro + predial /mes</Label>
+                  <Label htmlFor="r-seguro">{t.tools.insuranceTax}</Label>
                   <Input
                     id="r-seguro"
                     type="number"
@@ -416,7 +414,7 @@ function RentalCalculatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    NOI anual
+                    {t.tools.noiAnnual}
                   </p>
                   <p className={`font-mono text-lg font-bold ${r.noiAnual >= 0 ? 'text-emerald-700' : 'text-destructive'}`}>
                     {fmtCOP(r.noiAnual)}
@@ -426,7 +424,7 @@ function RentalCalculatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    Cap Rate
+                    {t.tools.capRate}
                   </p>
                   <p className="font-mono text-lg font-bold text-foreground">
                     {r.capRatePct.toFixed(1)}%
@@ -436,7 +434,7 @@ function RentalCalculatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    Cash-on-Cash
+                    {t.tools.cashOnCash}
                   </p>
                   <p className={`font-mono text-lg font-bold ${r.cashOnCashPct >= 0 ? 'text-emerald-700' : 'text-destructive'}`}>
                     {r.cashOnCashPct.toFixed(1)}%
@@ -446,7 +444,7 @@ function RentalCalculatorSection() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-1">
-                    ROI total año 1
+                    {t.tools.roiYear1}
                   </p>
                   <p className="font-mono text-lg font-bold text-foreground">
                     {r.roiTotalPct.toFixed(1)}%
@@ -458,37 +456,34 @@ function RentalCalculatorSection() {
             <Card>
               <CardContent className="pt-6 space-y-3">
                 <div className="flex justify-between text-sm border-b border-dashed border-border pb-3">
-                  <span className="text-muted-foreground">Ingreso bruto por hospedaje (anual)</span>
+                  <span className="text-muted-foreground">{t.tools.grossIncome}</span>
                   <span className="font-mono">{fmtCOP(r.ingresoBrutoAnual)}</span>
                 </div>
                 <div className="flex justify-between text-sm border-b border-dashed border-border pb-3">
-                  <span className="text-muted-foreground">Comisión de plataforma (anual)</span>
+                  <span className="text-muted-foreground">{t.tools.platformCommission}</span>
                   <span className="font-mono">- {fmtCOP(r.comisionAnual)}</span>
                 </div>
                 <div className="flex justify-between text-sm border-b border-dashed border-border pb-3">
-                  <span className="text-muted-foreground">Gastos operativos (anual)</span>
+                  <span className="text-muted-foreground">{t.tools.operatingCosts}</span>
                   <span className="font-mono">- {fmtCOP(r.gastosAnual)}</span>
                 </div>
                 <div className="flex justify-between text-sm border-b border-dashed border-border pb-3">
-                  <span className="text-muted-foreground">Servicio de deuda (anual)</span>
+                  <span className="text-muted-foreground">{t.tools.debtService}</span>
                   <span className="font-mono">- {fmtCOP(r.servicioDeudaAnual)}</span>
                 </div>
                 <div className="flex justify-between text-sm border-b border-dashed border-border pb-3">
-                  <span className="text-muted-foreground">Efectivo invertido</span>
+                  <span className="text-muted-foreground">{t.tools.cashInvested}</span>
                   <span className="font-mono">{fmtCOP(r.inversionEfectiva)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-semibold pt-1">
-                  <span>Flujo de caja neto anual</span>
+                  <span>{t.tools.netCashFlow}</span>
                   <span className="font-mono">{fmtCOP(r.flujoCajaAnual)}</span>
                 </div>
               </CardContent>
             </Card>
 
             <p className="text-xs text-muted-foreground leading-relaxed bg-background rounded-lg p-4 border border-border">
-              Estimación con fines de planeación, no constituye asesoría
-              financiera. Incluye un costo de cierre estimado del 3% del
-              precio de compra. Ajusta tarifa y ocupación con datos reales
-              del sector para cada proyecto.
+              {t.tools.rentalDisclaimer}
             </p>
           </div>
         </div>

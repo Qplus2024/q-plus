@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { TrendingUp, Shield, PieChart, FileCheck, ArrowRight } from 'lucide-react';
@@ -9,6 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import heroImg from '@/assets/investment-hero.jpg';
+import { useT } from '@/i18n/LanguageContext';
+import { useAutoTranslate } from '@/hooks/useAutoTranslate';
 
 const countryFlags: Record<string, string> = {
   'Estados Unidos': '🇺🇸', 'España': '🇪🇸', 'Portugal': '🇵🇹', 'Colombia': '🇨🇴',
@@ -57,15 +59,16 @@ interface Investment {
   slug: string;
 }
 
-const typeLabels: Record<string, string> = {
-  residencial: 'Residencial',
-  comercial: 'Comercial',
-  fondo: 'Fondo',
-};
-
 export default function Inversiones() {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useT();
+
+  const typeLabels: Record<string, string> = {
+    residencial: t.investmentsSlider.typeResidential,
+    comercial: t.investmentsSlider.typeCommercial,
+    fondo: t.investmentsSlider.typeFund,
+  };
 
   useEffect(() => {
     supabase
@@ -79,6 +82,9 @@ export default function Inversiones() {
       });
   }, []);
 
+  const titles = useMemo(() => investments.map((i) => i.title), [investments]);
+  const translatedTitles = useAutoTranslate(titles);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -87,7 +93,7 @@ export default function Inversiones() {
       <section className="relative h-[70vh] min-h-[500px] mt-16 flex items-center justify-center overflow-hidden">
         <img
           src={heroImg}
-          alt="Skyline internacional"
+          alt={t.investments.heroAlt}
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
@@ -100,17 +106,17 @@ export default function Inversiones() {
             className="max-w-3xl mx-auto"
           >
             <Badge className="mb-6 bg-primary text-primary-foreground font-semibold text-sm px-4 py-1.5 border-none">
-              Inversiones Internacionales
+              {t.investments.badge}
             </Badge>
             <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
-              Invierte en el exterior con respaldo experto
+              {t.investments.heroTitle}
             </h1>
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base px-8 py-6 rounded-lg"
               onClick={() => document.getElementById('quiz')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Descubre tu perfil de inversor
+              {t.investments.heroCta}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
@@ -122,9 +128,9 @@ export default function Inversiones() {
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {[
-              { target: 2, prefix: 'USD ', suffix: 'M+', label: 'gestionados' },
-              { target: 15, suffix: '+', label: 'países' },
-              { target: 200, suffix: '+', label: 'inversores' },
+              { target: 2, prefix: 'USD ', suffix: 'M+', label: t.investments.metricManaged },
+              { target: 15, suffix: '+', label: t.investments.metricCountries },
+              { target: 200, suffix: '+', label: t.investments.metricInvestors },
             ].map((m, i) => (
               <motion.div
                 key={i}
@@ -154,10 +160,10 @@ export default function Inversiones() {
             className="text-center mb-14"
           >
             <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-              Oportunidades de inversión
+              {t.investments.oppsTitle}
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Accede a propiedades y fondos seleccionados en los mercados más rentables del mundo.
+              {t.investments.oppsSubtitle}
             </p>
           </motion.div>
 
@@ -168,7 +174,7 @@ export default function Inversiones() {
               ))}
             </div>
           ) : investments.length === 0 ? (
-            <p className="text-center text-muted-foreground py-16">Próximamente nuevas oportunidades de inversión.</p>
+            <p className="text-center text-muted-foreground py-16">{t.investments.noOpps}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {investments.map((inv, i) => (
@@ -184,7 +190,7 @@ export default function Inversiones() {
                     <div className="h-44 overflow-hidden">
                       <img
                         src={inv.image_url}
-                        alt={inv.title}
+                        alt={translatedTitles[i] || inv.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
@@ -194,19 +200,19 @@ export default function Inversiones() {
                       <span className="text-lg">{getFlag(inv.country)}</span>
                       <span className="text-muted-foreground text-sm">{inv.country}{inv.city ? `, ${inv.city}` : ''}</span>
                     </div>
-                    <h3 className="text-foreground font-semibold text-lg mb-3 line-clamp-2">{inv.title}</h3>
+                    <h3 className="text-foreground font-semibold text-lg mb-3 line-clamp-2">{translatedTitles[i] || inv.title}</h3>
                     <div className="flex flex-wrap items-center gap-2 mb-4">
                       <Badge variant="outline" className="border-border text-muted-foreground text-xs">
                         {typeLabels[inv.type]}
                       </Badge>
                       {inv.expected_return != null && (
                         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs border">
-                          {inv.expected_return}% retorno
+                          {inv.expected_return}% {t.investments.returnLabel}
                         </Badge>
                       )}
                     </div>
                     <p className="text-primary font-semibold text-sm">
-                      Desde {inv.currency ?? 'USD'} {inv.min_amount.toLocaleString('es')}
+                      {t.investments.from} {inv.currency ?? 'USD'} {inv.min_amount.toLocaleString('es')}
                     </p>
                   </div>
                 </motion.div>
@@ -229,17 +235,17 @@ export default function Inversiones() {
               <TrendingUp className="h-8 w-8 text-primary-foreground" />
             </div>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-              ¿Qué tipo de inversor eres?
+              {t.investments.quizTitle}
             </h2>
             <p className="text-primary-foreground/70 mb-8 max-w-lg mx-auto">
-              En 3 minutos descubre si eres un inversor conservador, moderado o agresivo y qué oportunidades son para ti.
+              {t.investments.quizText}
             </p>
             <Button
               size="lg"
               className="bg-background hover:bg-background/90 text-foreground font-semibold text-base px-10 py-6 rounded-lg"
               asChild
             >
-              <a href="#quiz">Hacer el test gratuito</a>
+              <a href="#quiz">{t.investments.quizButton}</a>
             </Button>
           </motion.div>
         </div>
@@ -252,18 +258,18 @@ export default function Inversiones() {
             {[
               {
                 icon: Shield,
-                title: 'Asesoría personalizada',
-                desc: 'Un experto dedicado te guía en cada paso, desde la selección hasta el cierre de tu inversión.',
+                title: t.investments.trust1Title,
+                desc: t.investments.trust1Desc,
               },
               {
                 icon: PieChart,
-                title: 'Portafolio diversificado',
-                desc: 'Accede a oportunidades en múltiples países y sectores para minimizar riesgos y maximizar retornos.',
+                title: t.investments.trust2Title,
+                desc: t.investments.trust2Desc,
               },
               {
                 icon: FileCheck,
-                title: 'Retornos documentados',
-                desc: 'Reportes transparentes y auditados sobre el rendimiento de cada oportunidad de inversión.',
+                title: t.investments.trust3Title,
+                desc: t.investments.trust3Desc,
               },
             ].map((item, i) => (
               <motion.div

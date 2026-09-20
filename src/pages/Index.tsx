@@ -5,6 +5,7 @@ import HeroSection from "@/components/home/HeroSection";
 import AboutSection from "@/components/home/AboutSection";
 import PropertiesSlider from "@/components/home/PropertiesSlider";
 import InvestmentsSlider from "@/components/home/InvestmentsSlider";
+import { useT } from "@/i18n/LanguageContext";
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -13,6 +14,8 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 const Index = () => {
+  const t = useT();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -26,10 +29,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              ¿Interesado en alguna propiedad?
+              {t.homeContact.title}
             </h2>
             <p className="font-body text-muted-foreground mb-12">
-              Contáctanos y te ayudaremos a encontrar el hogar perfecto para ti
+              {t.homeContact.subtitle}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
@@ -37,7 +40,7 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Phone className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Teléfono</h3>
+                <h3 className="font-display font-semibold text-foreground mb-2">{t.homeContact.phone}</h3>
                 <p className="font-body text-muted-foreground text-sm">+57 316 875 4469</p>
               </div>
 
@@ -45,7 +48,7 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Mail className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Email</h3>
+                <h3 className="font-display font-semibold text-foreground mb-2">{t.homeContact.email}</h3>
                 <p className="font-body text-muted-foreground text-sm">qplusinmobiliaria@gmail.com</p>
               </div>
 
@@ -53,14 +56,14 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <MapPin className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-foreground mb-2">Conoce más</h3>
-                <p className="font-body text-muted-foreground text-sm">Contáctanos y agenda tu visita</p>
+                <h3 className="font-display font-semibold text-foreground mb-2">{t.homeContact.knowMore}</h3>
+                <p className="font-body text-muted-foreground text-sm">{t.homeContact.knowMoreText}</p>
               </div>
             </div>
 
             {/* Social Media Links */}
             <div className="text-center">
-              <p className="font-body text-muted-foreground mb-4">Síguenos en redes</p>
+              <p className="font-body text-muted-foreground mb-4">{t.homeContact.followUs}</p>
               <div className="flex justify-center gap-4">
                 <a
                   href="https://www.instagram.com/qplus.inmobiliaria/"

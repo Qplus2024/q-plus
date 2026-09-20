@@ -3,6 +3,8 @@ import { Bed, Bath, Maximize, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getSizesForCard } from '@/lib/image-utils';
+import { useT } from '@/i18n/LanguageContext';
+
 interface PropertyCardProps {
   id: string;
   slug: string;
@@ -33,6 +35,8 @@ const PropertyCard = ({
   status,
   mainImage,
 }: PropertyCardProps) => {
+  const t = useT();
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -44,10 +48,10 @@ const PropertyCard = ({
 
   const getStatusBadge = () => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      available: { label: 'Disponible', variant: 'default' },
-      sold: { label: 'Vendido', variant: 'destructive' },
-      rented: { label: 'Arrendado', variant: 'secondary' },
-      reserved: { label: 'Reservado', variant: 'outline' },
+      available: { label: t.status.available, variant: 'default' },
+      sold: { label: t.status.sold, variant: 'destructive' },
+      rented: { label: t.status.rented, variant: 'secondary' },
+      reserved: { label: t.status.reserved, variant: 'outline' },
     };
     return statusMap[status] || { label: status, variant: 'outline' as const };
   };
@@ -89,7 +93,7 @@ const PropertyCard = ({
                 )}
                 {(display_price_mode === 'rent' || display_price_mode === 'both') && price_rent && (
                   <p className="font-body text-sm opacity-90">
-                    {formatPrice(price_rent)}/mes
+                    {formatPrice(price_rent)}{t.property.perMonth}
                   </p>
                 )}
               </>

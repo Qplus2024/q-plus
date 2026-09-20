@@ -1,18 +1,15 @@
 import { MapPin, Bed, Bath, Maximize } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Property, PropertyStatus, PriceDisplayMode } from "@/types/property";
+import { useT } from "@/i18n/LanguageContext";
 
 interface PropertyInfoProps {
   property: Property;
+  /** Title already translated by the page (falls back to property.title) */
+  displayTitle?: string;
+  /** Description already translated by the page */
+  displayDescription?: string | null;
 }
-
-const statusLabels: Record<PropertyStatus, string> = {
-  draft: "Borrador",
-  available: "Disponible",
-  reserved: "Reservado",
-  sold: "Vendido",
-  rented: "Arrendado",
-};
 
 const statusColors: Record<PropertyStatus, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -32,7 +29,21 @@ const formatPrice = (price: number | null): string => {
   }).format(price);
 };
 
-const PropertyInfo = ({ property }: PropertyInfoProps) => {
+const PropertyInfo = ({ property, displayTitle, displayDescription }: PropertyInfoProps) => {
+  const t = useT();
+
+  const statusLabels: Record<PropertyStatus, string> = {
+    draft: t.status.draft,
+    available: t.status.available,
+    reserved: t.status.reserved,
+    sold: t.status.sold,
+    rented: t.status.rented,
+  };
+
+  const title = displayTitle || property.title;
+  const description =
+    displayDescription === undefined ? property.main_description : displayDescription;
+
   const location = [property.neighborhood, property.city]
     .filter(Boolean)
     .join(", ");
@@ -48,7 +59,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
               <span className="text-2xl md:text-3xl font-bold text-foreground">
                 {formatPrice(property.price_sale)}
               </span>
-              <span className="text-muted-foreground ml-2">Venta</span>
+              <span className="text-muted-foreground ml-2">{t.property.sale}</span>
             </div>
           )}
           {property.price_rent && (
@@ -56,7 +67,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
               <span className="text-xl md:text-2xl font-semibold text-foreground">
                 {formatPrice(property.price_rent)}
               </span>
-              <span className="text-muted-foreground ml-2">/mes Arriendo</span>
+              <span className="text-muted-foreground ml-2">{t.property.rentPerMonth}</span>
             </div>
           )}
         </div>
@@ -69,7 +80,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
           <span className="text-2xl md:text-3xl font-bold text-foreground">
             {formatPrice(property.price_rent)}
           </span>
-          <span className="text-muted-foreground ml-2">/mes</span>
+          <span className="text-muted-foreground ml-2">{t.property.perMonth}</span>
         </div>
       );
     }
@@ -82,7 +93,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
       );
     }
     
-    return <span className="text-muted-foreground">Precio a consultar</span>;
+    return <span className="text-muted-foreground">{t.property.priceOnRequest}</span>;
   };
 
   return (
@@ -97,7 +108,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
 
       {/* Title */}
       <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-foreground">
-        {property.title}
+        {title}
       </h1>
 
       {/* Location */}
@@ -120,7 +131,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
             </div>
             <div>
               <p className="text-lg font-semibold">{property.bedrooms}</p>
-              <p className="text-xs text-muted-foreground">Habitaciones</p>
+              <p className="text-xs text-muted-foreground">{t.property.bedrooms}</p>
             </div>
           </div>
         )}
@@ -131,7 +142,7 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
             </div>
             <div>
               <p className="text-lg font-semibold">{property.bathrooms}</p>
-              <p className="text-xs text-muted-foreground">Baños</p>
+              <p className="text-xs text-muted-foreground">{t.property.bathrooms}</p>
             </div>
           </div>
         )}
@@ -149,11 +160,11 @@ const PropertyInfo = ({ property }: PropertyInfoProps) => {
       </div>
 
       {/* Description */}
-      {property.main_description && (
+      {description && (
         <div className="pt-2">
-          <h2 className="text-lg font-semibold mb-3">Descripción</h2>
+          <h2 className="text-lg font-semibold mb-3">{t.property.description}</h2>
           <p className="text-muted-foreground font-body leading-relaxed whitespace-pre-line">
-            {property.main_description}
+            {description}
           </p>
         </div>
       )}

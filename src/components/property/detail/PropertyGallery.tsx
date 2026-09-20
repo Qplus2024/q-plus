@@ -14,6 +14,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { getSizesForGalleryMain, getSizesForGalleryThumb, getOptimizedUrl } from "@/lib/image-utils";
 import type { PropertyMedia } from "@/types/property";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n/LanguageContext";
 
 interface PropertyGalleryProps {
   media: PropertyMedia[];
@@ -65,6 +66,7 @@ const TOTAL_SMALL_CELLS = 10;
 const MAX_VISIBLE = 11; // 1 main + 10 small
 
 const PropertyGallery = ({ media, title }: PropertyGalleryProps) => {
+  const t = useT();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -106,7 +108,7 @@ const PropertyGallery = ({ media, title }: PropertyGalleryProps) => {
   if (!media.length) {
     return (
       <div className="w-full aspect-video bg-muted rounded-xl flex items-center justify-center">
-        <p className="text-muted-foreground">Sin imágenes disponibles</p>
+        <p className="text-muted-foreground">{t.property.noImages}</p>
       </div>
     );
   }
