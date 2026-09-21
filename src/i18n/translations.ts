@@ -88,6 +88,7 @@ const es = {
   footer: {
     tagline: 'Tu aliado inmobiliario de confianza. Encontramos el hogar perfecto para ti.',
     linksTitle: 'Enlaces',
+    privateListings: 'Propiedades privadas',
     contactTitle: 'Contacto',
     followTitle: 'Síguenos',
     address: 'Calle 100 #15-20, Bogotá',
@@ -380,6 +381,7 @@ const en: typeof es = {
   footer: {
     tagline: 'Your trusted real estate partner. We find the perfect home for you.',
     linksTitle: 'Links',
+    privateListings: 'Private listings',
     contactTitle: 'Contact',
     followTitle: 'Follow us',
     address: 'Calle 100 #15-20, Bogotá',

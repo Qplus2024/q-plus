@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Instagram, Youtube } from 'lucide-react';
 import logo from '@/assets/logo_qplus.png';
 import { useT } from '@/i18n/LanguageContext';
+import { FEATURES } from '@/config/features';
 
 // TikTok icon (not available in Lucide)
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -16,6 +17,9 @@ const Footer = () => {
   const links = [
     { to: '/', label: t.nav.home },
     { to: '/propiedades', label: t.nav.properties },
+    ...(FEATURES.privateListings
+      ? [{ to: '/propiedades#privadas', label: t.footer.privateListings }]
+      : []),
     { to: '/herramientas', label: t.nav.tools },
     { to: '/mesa-inversionistas', label: t.nav.investorTable },
   ];

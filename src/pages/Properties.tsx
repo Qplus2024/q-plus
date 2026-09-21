@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import PropertyCard from '@/components/property/PropertyCard';
+import { PrivateListingsSection } from '@/components/property/PrivateListingsSection';
+import { FEATURES } from '@/config/features';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -240,6 +242,8 @@ const Properties = () => {
           )}
         </div>
       </section>
+
+      {FEATURES.privateListings && <PrivateListingsSection />}
 
       <Footer />
     </div>
